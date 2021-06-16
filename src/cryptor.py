@@ -52,15 +52,15 @@ class Cryptor(commands.Cog):
             price_change = float(json_data["priceChange"])
             if price_change > 0:
                 await ctx.send(
-                    f"{symbol} price pumped by: {price_change} and {json_data['priceChangePercent']}%"
+                    f"{symbol} price pumped by: {price_change} ({json_data['priceChangePercent']}%)"
                 )
             elif price_change < 0:
                 await ctx.send(
-                    f"{symbol} price dumped by: {price_change} and {json_data['priceChangePercent']}%"
+                    f"{symbol} price dumped by: {price_change} ({json_data['priceChangePercent']}%)"
                 )
             else:
                 await ctx.send(
-                    f"{symbol} price did not change in 24hrs. Use !price to find out current price."
+                    f"{symbol} price did not change in 24hrs. Use !price to find out the current price."
                 )
 
 
