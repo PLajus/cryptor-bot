@@ -1,17 +1,16 @@
-# Cryptor main script
+"""Cryptor main script"""
 
 import os
 import requests
 from dotenv import load_dotenv
 from discord.ext import commands
 
-
 bot = commands.Bot(command_prefix="!")
 
 
 @bot.event
 async def on_ready():
-    print("{0.user} has connected to Discord".format(bot))
+    print(f"{bot.user} has connected to Discord")
 
 
 class Cryptor(commands.Cog):
@@ -22,7 +21,7 @@ class Cryptor(commands.Cog):
     # Ping Binance servers to check connectivity
     @commands.command(help="Pings Binance server")
     async def pingcz(self, ctx):
-        if self.binance.test_connectivity() is not None:
+        if self.binance.test_connectivity() != False:
             await ctx.send("funds are safu")
 
     # Get latest symbol price
@@ -64,20 +63,60 @@ class Cryptor(commands.Cog):
                 )
 
 
+"""
+# Command error handling
+class CommandErrorHandler(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
+
+    @commands.Cog.listener()
+    async def on_command_error(self, ctx, error):
+"""
+
+
+# Exception handling for HTTP GET requests
+def exception_handler_get(func):
+    def wrapper(*args, **kwargs):
+        try:
+            r = func(*args, **kwargs)
+            r.raise_for_status()
+        except requests.exceptions.HTTPError as errh:
+            print("HTTP Error:", errh)
+            return False
+        except requests.exceptions.ConnectionError as errc:
+            print("Error Connecting:", errc)
+            return False
+        except requests.exceptions.Timeout as errt:
+            print("Timeout Error:", errt)
+            return False
+        except requests.exceptions.RequestException as err:
+            print("Something went wrong:", err)
+            return False
+        else:
+            return func(*args, **kwargs)
+
+    return wrapper
+
+
 class BinanceAPI:
     def __init__(self):
-        self.BASE_URL = "https://api.binance.com/api/"
+        self.BASE_URL = "https://api.binance.com/api2/"
 
+    @exception_handler_get
     def test_connectivity(self):
-        return requests.get(self.BASE_URL + "v3/ping")
+        return requests.get(self.BASE_URL + "v3/ping", timeout=3)
 
+    @exception_handler_get
     def get_price(self, symbol):
         payload = {"symbol": symbol}
-        return requests.get(self.BASE_URL + "v3/ticker/price", params=payload)
+        return requests.get(
+            self.BASE_URL + "v3/ticker/price", params=payload, timeout=3
+        )
 
+    @exception_handler_get
     def get_24hrdata(self, symbol):
         payload = {"symbol": symbol}
-        return requests.get(self.BASE_URL + "v3/ticker/24hr", params=payload)
+        return requests.get(self.BASE_URL + "v3/ticker/24hr", params=payload, timeout=3)
 
 
 if __name__ == "__main__":
