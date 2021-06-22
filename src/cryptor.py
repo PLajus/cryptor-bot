@@ -1,7 +1,7 @@
 """Cryptor main script"""
 
 import os
-import requests
+import binanceAPI
 from dotenv import load_dotenv
 from discord.ext import commands
 
@@ -16,12 +16,13 @@ async def on_ready():
 class Cryptor(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.binance = BinanceAPI()
+        self.binance = binanceAPI.Binance()
 
     # Ping Binance servers to check connectivity
     @commands.command(help="Pings Binance server")
     async def pingcz(self, ctx):
-        if self.binance.test_connectivity() != False:
+        resp = self.binance.test_connectivity()
+        if resp.status_code == 200:
             await ctx.send("funds are safu")
 
     # Get latest symbol price
@@ -62,66 +63,14 @@ class Cryptor(commands.Cog):
                     f"{symbol} price did not change in 24hrs. Use !price to find out the current price."
                 )
 
-
-"""
-# Command error handling
-class CommandErrorHandler(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
-
-    @commands.Cog.listener()
-    async def on_command_error(self, ctx, error):
-"""
-
-
-# Exception handling for HTTP GET requests
-def exception_handler_get(func):
-    def wrapper(*args, **kwargs):
-        try:
-            r = func(*args, **kwargs)
-            r.raise_for_status()
-        except requests.exceptions.HTTPError as errh:
-            print("HTTP Error:", errh)
-            return False
-        except requests.exceptions.ConnectionError as errc:
-            print("Error Connecting:", errc)
-            return False
-        except requests.exceptions.Timeout as errt:
-            print("Timeout Error:", errt)
-            return False
-        except requests.exceptions.RequestException as err:
-            print("Something went wrong:", err)
-            return False
-        else:
-            return func(*args, **kwargs)
-
-    return wrapper
-
-
-class BinanceAPI:
-    def __init__(self):
-        self.BASE_URL = "https://api.binance.com/api2/"
-
-    @exception_handler_get
-    def test_connectivity(self):
-        return requests.get(self.BASE_URL + "v3/ping", timeout=3)
-
-    @exception_handler_get
-    def get_price(self, symbol):
-        payload = {"symbol": symbol}
-        return requests.get(
-            self.BASE_URL + "v3/ticker/price", params=payload, timeout=3
-        )
-
-    @exception_handler_get
-    def get_24hrdata(self, symbol):
-        payload = {"symbol": symbol}
-        return requests.get(self.BASE_URL + "v3/ticker/24hr", params=payload, timeout=3)
-
-
 if __name__ == "__main__":
     load_dotenv()
     TOKEN = os.getenv("DISCORD_TOKEN")
+
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    for filename in os.listdir(f"{dir_path}/cogs"):
+        if filename.endswith(".py"):
+            bot.load_extension(f"cogs.{filename[:-3]}")
 
     bot.add_cog(Cryptor(bot))
     bot.run(TOKEN)
