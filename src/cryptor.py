@@ -19,49 +19,38 @@ class Cryptor(commands.Cog):
         self.binance = binanceAPI.Binance()
 
     # Ping Binance servers to check connectivity
-    @commands.command(help="Pings Binance server")
+    @commands.command(help="Pings Binance server", aliases=["pingCZ"])
     async def pingcz(self, ctx):
-        resp = self.binance.test_connectivity()
-        if resp.status_code == 200:
+       if self.binance.test_connectivity().status_code == 200:
             await ctx.send("funds are safu")
 
     # Get latest symbol price
     @commands.command(help="Displays the latest price of a symbol.")
     async def price(self, ctx, symbol):
         json_data = self.binance.get_price(symbol).json()
-        if "code" in json_data:
-            if json_data["code"] == -1100:
-                await ctx.send("Invalid symbol. Format example: BTCUSDT")
-            if json_data["code"] == -1121:
-                await ctx.send("Pair does not exist.")
-        elif "price" in json_data:
-            await ctx.send(f"{symbol}: {float(json_data['price'])}")
+        await ctx.send(f"{symbol}: {float(json_data['price'])}")
 
     # Get the 24hr price change of a symbol
     @commands.command(
         help="Displays the 24hr. price change of a symbol.", aliases=["24change"]
     )
     async def change24(self, ctx, symbol):
+
         json_data = self.binance.get_24hrdata(symbol).json()
-        if "code" in json_data:
-            if json_data["code"] == -1100:
-                await ctx.send("Invalid symbol. Format example: BTCUSDT")
-            if json_data["code"] == -1121:
-                await ctx.send("Pair does not exist.")
+        price_change = float(json_data["priceChange"])
+
+        if price_change > 0:
+             await ctx.send(
+                f"{symbol} price pumped by: {price_change} ({json_data['priceChangePercent']}%)"
+            )
+        elif price_change < 0:
+            await ctx.send(
+                f"{symbol} price dumped by: {price_change} ({json_data['priceChangePercent']}%)"
+            )
         else:
-            price_change = float(json_data["priceChange"])
-            if price_change > 0:
-                await ctx.send(
-                    f"{symbol} price pumped by: {price_change} ({json_data['priceChangePercent']}%)"
-                )
-            elif price_change < 0:
-                await ctx.send(
-                    f"{symbol} price dumped by: {price_change} ({json_data['priceChangePercent']}%)"
-                )
-            else:
-                await ctx.send(
-                    f"{symbol} price did not change in 24hrs. Use !price to find out the current price."
-                )
+            await ctx.send(
+               f"{symbol} price did not change in 24hrs. Use !price to find out the current price."
+            )
 
 if __name__ == "__main__":
     load_dotenv()
