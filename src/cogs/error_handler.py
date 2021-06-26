@@ -31,6 +31,9 @@ class CommandErrorHandler(commands.Cog):
             except discord.HTTPException:
                 pass
 
+        elif isinstance(error, commands.MissingRequiredArgument):
+            await ctx.send("Symbol is missing.")
+
         elif isinstance(error, HTTPError):
             try:
                 await ctx.send(error.response.json()['msg'])
@@ -45,7 +48,8 @@ class CommandErrorHandler(commands.Cog):
 
         # All other errors
         else:
-            await ctx.send(f'There was en error: {error}')            
+            print(f'There was en error: {error}')
+            await ctx.send('Something went wrong.')            
 
    
 def setup(bot):
