@@ -1,13 +1,14 @@
 """ Price related commands cog """
 
-import binanceAPI
+
+from apis.binanceAPI import Binance
 from discord.ext import commands
 
 
 class Price(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.binance = binanceAPI.Binance()
+        self.binance = Binance()
 
     # Ping Binance servers to check connectivity
     @commands.command(help="Pings Binance server", aliases=["pingCZ"])
