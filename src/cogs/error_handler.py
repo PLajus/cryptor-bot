@@ -1,9 +1,10 @@
-""" Error handling"""
+""" Error handling cog """
 
 import discord
 from discord.ext import commands
 from requests.exceptions import Timeout
 from requests.models import HTTPError
+
 
 class CommandErrorHandler(commands.Cog):
     def __init__(self, bot):
@@ -15,19 +16,21 @@ class CommandErrorHandler(commands.Cog):
         if ctx.command.has_error_handler() or ctx.cog.has_error_handler():
             return
 
-        ignored_errs = (commands.CommandNotFound)
+        ignored_errs = commands.CommandNotFound
 
         # Allows to check for original exceptions raised and sent to CommandInvokeError.
         # If nothing is found, keep the exception passed to on_command_error.
-        error = getattr(error, 'original', error)
+        error = getattr(error, "original", error)
 
         # Igored errors are silenced
         if isinstance(error, ignored_errs):
             return
-        
+
         elif isinstance(error, commands.NoPrivateMessage):
             try:
-                await ctx.author.send(f'{ctx.command} can not be used in Private Messages.')
+                await ctx.author.send(
+                    f"{ctx.command} can not be used in Private Messages."
+                )
             except discord.HTTPException:
                 pass
 
@@ -36,21 +39,21 @@ class CommandErrorHandler(commands.Cog):
 
         elif isinstance(error, HTTPError):
             try:
-                await ctx.send(error.response.json()['msg'])
+                await ctx.send(error.response.json()["msg"])
             except ValueError:
-                await ctx.send(f'There was an HTTP error: {error.response.status_code}')
+                await ctx.send(f"There was an HTTP error: {error.response.status_code}")
 
         elif isinstance(error, ConnectionError):
             await ctx.send("There was a Connection Error. Please try again later.")
-        
+
         elif isinstance(error, Timeout):
             await ctx.send("There was a Timeout Error. Please try again later.")
 
         # All other errors
         else:
-            print(f'There was en error: {error}')
-            await ctx.send('Something went wrong.')            
+            print(f"There was en error: {error}")
+            await ctx.send("Something went wrong.")
 
-   
+
 def setup(bot):
     bot.add_cog(CommandErrorHandler(bot))
