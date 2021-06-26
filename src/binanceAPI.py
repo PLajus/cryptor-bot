@@ -42,6 +42,3 @@ class Binance:
     def get_24hrdata(self, symbol):
         payload = {"symbol": symbol}
         return requests.get(self.BASE_URL + "v3/ticker/24hr", params=payload, timeout=3)
-
-def setup(bot):
-    pass
