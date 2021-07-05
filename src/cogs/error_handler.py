@@ -39,7 +39,10 @@ class CommandErrorHandler(commands.Cog):
 
         elif isinstance(error, HTTPError):
             try:
-                await ctx.send(error.response.json()["msg"])
+                if error.response.json()["code"] == -1100:
+                    await ctx.send("Symbol has invalid characters or needs to be in upper case.")
+                else:
+                    await ctx.send(error.response.json()["msg"])
             except ValueError:
                 await ctx.send(f"There was an HTTP error: {error.response.status_code}")
 
