@@ -1,6 +1,5 @@
 """ Price related commands cog """
 
-
 from apis.binanceAPI import Binance
 from discord.ext import commands
 
@@ -9,12 +8,6 @@ class Price(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.binance = Binance()
-
-    # Ping Binance servers to check connectivity
-    @commands.command(help="Pings Binance server", aliases=["pingCZ"])
-    async def pingcz(self, ctx):
-        if self.binance.test_connectivity().status_code == 200:
-            await ctx.send("funds are safu")
 
     # Get latest symbol price
     @commands.command(help="Displays the latest price of a symbol.")
