@@ -35,7 +35,7 @@ class CommandErrorHandler(commands.Cog):
                 pass
 
         elif isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send("Symbol is missing.")
+            await ctx.send("Required argument is missing.")
 
         elif isinstance(error, HTTPError):
             try:
