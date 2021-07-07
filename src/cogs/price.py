@@ -10,15 +10,13 @@ class Price(commands.Cog):
         self.binance = Binance()
 
     # Get latest symbol price
-    @commands.command(help="Displays the latest price of a symbol.")
+    @commands.command(aliases=["p"])
     async def price(self, ctx, symbol):
         json_data = self.binance.get_price(symbol).json()
         await ctx.send(f"{symbol}: {float(json_data['price'])}")
 
     # Get the 24hr price change of a symbol
-    @commands.command(
-        help="Displays the 24hr. price change of a symbol.", aliases=["24change"]
-    )
+    @commands.command(aliases=["24change", "c24"])
     async def change24(self, ctx, symbol):
 
         json_data = self.binance.get_24hrdata(symbol).json()

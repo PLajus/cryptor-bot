@@ -5,8 +5,14 @@ from dotenv import load_dotenv
 import discord
 from discord.ext import commands
 
-activity = discord.Activity(type=discord.ActivityType.watching, name="the charts")
-bot = commands.Bot(command_prefix="$", activity=activity, status=discord.Status.online)
+
+activity = discord.Activity(type=discord.ActivityType.watching, name="charts | $help")
+bot = commands.Bot(
+    command_prefix="$",
+    activity=activity,
+    status=discord.Status.online,
+    help_command=None,
+)
 
 # Loading cogs
 if __name__ == "__main__":
