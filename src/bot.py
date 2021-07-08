@@ -9,6 +9,7 @@ from discord.ext import commands
 activity = discord.Activity(type=discord.ActivityType.watching, name="charts | $help")
 bot = commands.Bot(
     command_prefix="$",
+    case_insensitive=True,
     activity=activity,
     status=discord.Status.online,
     help_command=None,
