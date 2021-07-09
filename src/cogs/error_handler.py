@@ -2,11 +2,10 @@
 
 import discord
 from discord.ext import commands
-from requests.exceptions import Timeout
-from requests.models import HTTPError
+import aiohttp
+import asyncio
 
-
-class CommandErrorHandler(commands.Cog):
+class ErrorHandler(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -18,8 +17,7 @@ class CommandErrorHandler(commands.Cog):
 
         ignored_errs = commands.CommandNotFound
 
-        # Allows to check for original exceptions raised and sent to CommandInvokeError.
-        # If nothing is found, keep the exception passed to on_command_error.
+        # Check for original exceptions raised and sent to CommandInvokeError
         error = getattr(error, "original", error)
 
         # Igored errors are silenced
@@ -37,26 +35,28 @@ class CommandErrorHandler(commands.Cog):
         elif isinstance(error, commands.MissingRequiredArgument):
             await ctx.send("Required argument is missing.")
 
-        elif isinstance(error, HTTPError):
-            try:
-                if error.response.json()["code"] == -1100:
-                    await ctx.send("Symbol has invalid characters or needs to be in upper case.")
-                else:
-                    await ctx.send(error.response.json()["msg"])
-            except ValueError:
-                await ctx.send(f"There was an HTTP error: {error.response.status_code}")
-
-        elif isinstance(error, ConnectionError):
+        elif isinstance(error, aiohttp.ClientResponseError):
+            if (error.code == 400):
+                await ctx.send('Symbol could not be found.')
+            else:            
+                print(f"There was en error: {error.code} {error.message}")
+                await ctx.send(f"There was an Error: {error.code} {error.message}. Please try again later.")
+        
+        elif isinstance(error, aiohttp.ClientConnectionError):
+            print(f"There was en error: {error.code} {error.message}")
             await ctx.send("There was a Connection Error. Please try again later.")
 
-        elif isinstance(error, Timeout):
-            await ctx.send("There was a Timeout Error. Please try again later.")
+        elif isinstance(error, aiohttp.ClientPayloadError,):
+            print(f"There was en error: {error.code} {error.message}")
+            await ctx.send("There was an Error. Please try again later.")
 
-        # All other errors
+        elif isinstance(error, asyncio.TimeoutError):
+            await ctx.send("There was a Timeout Error. Please try again later.")        
+
         else:
-            print(f"There was en error: {error}")
+            print(f"There was en error: {error.code}, {error.message}")
             await ctx.send("Something went wrong.")
 
 
 def setup(bot):
-    bot.add_cog(CommandErrorHandler(bot))
+    bot.add_cog(ErrorHandler(bot))

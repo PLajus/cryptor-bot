@@ -12,7 +12,7 @@ class Misc(commands.Cog):
     # Ping Binance servers to check connectivity
     @commands.command(help="Pings Binance server")
     async def pingcz(self, ctx):
-        if self.binance.test_connectivity().status_code == 200:
+        if await self.binance.ping_binance() == 200:
             await ctx.send("funds are safu")
 
 

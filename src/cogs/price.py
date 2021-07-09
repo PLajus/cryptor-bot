@@ -12,14 +12,14 @@ class Price(commands.Cog):
     # Get latest symbol price
     @commands.command(aliases=["p"])
     async def price(self, ctx, symbol):
-        json_data = self.binance.get_price(symbol).json()
+        json_data = await self.binance.get_price(symbol)
         await ctx.send(f"{symbol}: {float(json_data['price'])}")
 
     # Get the 24hr price change of a symbol
     @commands.command(aliases=["24change", "c24"])
     async def change24(self, ctx, symbol):
 
-        json_data = self.binance.get_24hrdata(symbol).json()
+        json_data = await self.binance.get_24hrdata(symbol)
         price_change = float(json_data["priceChange"])
 
         if price_change > 0:
