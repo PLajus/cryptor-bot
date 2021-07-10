@@ -12,8 +12,8 @@ class ErrorHandler(commands.Cog):
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
 
-        if ctx.command.has_error_handler() or ctx.cog.has_error_handler():
-            return
+        #if ctx.command.has_error_handler() or ctx.cog.has_error_handler():
+        #    return
 
         ignored_errs = commands.CommandNotFound
 
@@ -54,7 +54,7 @@ class ErrorHandler(commands.Cog):
             await ctx.send("There was a Timeout Error. Please try again later.")        
 
         else:
-            print(f"There was en error: {error.code}, {error.message}")
+            print(f"There was en error: {error}")
             await ctx.send("Something went wrong.")
 
 
