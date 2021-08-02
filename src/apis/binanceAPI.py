@@ -29,3 +29,11 @@ class Binance:
                 self.BASE_URL + "v3/ticker/24hr", params=params, raise_for_status=True
             ) as response:
                 return await response.json()
+
+    async def get_orders(self, symbol):
+        params = {"symbol": symbol, "limit": 5}
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                self.BASE_URL + "v3/depth", params=params, raise_for_status=True
+            ) as response:
+                return await response.json()
