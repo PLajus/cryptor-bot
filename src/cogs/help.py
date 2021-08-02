@@ -66,26 +66,42 @@ class Help(commands.Cog):
                         description=command.help,
                         colour=discord.Colour.dark_green(),
                     )
-                    cmd_aliases = ''
+                    cmd_aliases = ""
                     for alias in command.aliases:
-                        cmd_aliases += f'`{alias}`, ' 
+                        cmd_aliases += f", `{alias}`"
+
                     embed.add_field(
-                    name="\u200b\nTriggers:",
-                    value=f"`{command.qualified_name}`, {cmd_aliases[0:-2]}",
-                    inline=False
+                        name="\u200b\nTriggers:",
+                        value=f"`{command.qualified_name}`{cmd_aliases}",
+                        inline=False,
                     )
 
                     embed.add_field(
                         name="Usage:",
                         value=f"`${command.qualified_name} {command.signature}`",
-                        inline=False
+                        inline=False,
                     )
 
-                    embed.add_field(
-                        name="Use Example:",
-                        value=f"`${command.qualified_name} BTCUSDT`",
-                        inline=False
-                    )
+                    if command.name == "pingcz":
+                        embed.add_field(
+                            name="Use Example:",
+                            value=f"`${command.qualified_name}`",
+                            inline=False,
+                        )
+
+                    elif command.name == "orders":
+                        embed.add_field(
+                            name="Use Example:",
+                            value=f"`${command.qualified_name} BTCUSDT`\n`${command.qualified_name} BTCUSDT 5 asks`\n`${command.qualified_name} ETHUSDT 10 bids`",
+                            inline=False,
+                        )
+
+                    else:
+                        embed.add_field(
+                            name="Use Example:",
+                            value=f"`${command.qualified_name} BTCUSDT`",
+                            inline=False,
+                        )
 
                 else:
                     embed = discord.Embed(
