@@ -60,7 +60,6 @@ class Help(commands.Cog):
             if len(input) == 1:
                 command = self.bot.get_command(input[0].lower())
                 if command is not None:
-
                     embed = discord.Embed(
                         title=f"Help | {command.name}",
                         description=command.help,
@@ -93,6 +92,13 @@ class Help(commands.Cog):
                         embed.add_field(
                             name="Use Example:",
                             value=f"`${command.qualified_name} BTCUSDT`\n`${command.qualified_name} BTCUSDT 5 asks`\n`${command.qualified_name} ETHUSDT 10 bids`",
+                            inline=False,
+                        )
+
+                    elif command.name == "history":
+                        embed.add_field(
+                            name="Use Example:",
+                            value=f"`${command.qualified_name} BTCUSDT yyyy-mm-dd`\n`${command.qualified_name} BTCUSDT 2021-08-15`",
                             inline=False,
                         )
 

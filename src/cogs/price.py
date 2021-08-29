@@ -3,7 +3,7 @@
 from apis.binanceAPI import Binance
 from discord.ext import commands
 import calendar
-from datetime import date, datetime, timedelta
+import datetime
 
 
 async def get_unix_ms_from_date(date):
@@ -49,36 +49,39 @@ class Price(commands.Cog, name="Price Data"):
         aliases=["h"],
         help="Displays the price of a Symbol at a past date. Price is shown at 12:00:00 AM GMT of specified date.",
     )
-    async def history(self, ctx, symbol, arg_date):
+    async def history(self, ctx, symbol, date):
         symbol = symbol.upper()
         format = "%Y-%m-%d"
 
         try:
-            datime_date = datetime.strptime(arg_date, format)
+            datime_date = datetime.datetime.strptime(date, format)
         except ValueError:
             await ctx.send("Incorrect date format. It should be `yyyy-mm-dd`.")
             return
 
-        today = date.today()
-        if datime_date > datetime(year=today.year, month=today.month, day=today.day):
+        today = datetime.date.today()
+        if datime_date > datetime.datetime(
+            year=today.year, month=today.month, day=today.day
+        ):
             await ctx.send("I'm afraid that I cannot predict the future... yet.")
             return
 
-        if datime_date < datetime(year=2017, month=9, day=3):
+        if datime_date < datetime.datetime(year=2017, month=9, day=3):
             await ctx.send("Oldest date I can go back to is **2017-09-03**.")
             return
 
         str_date = datime_date.strftime("%m/%d/%Y")
         start_date = await get_unix_ms_from_date(
-            datetime.strptime(str_date, "%m/%d/%Y")
+            datetime.datetime.strptime(str_date, "%m/%d/%Y")
         )
 
         end_date = await get_unix_ms_from_date(
-            datetime.strptime(str_date, "%m/%d/%Y") + timedelta(minutes=1)
+            datetime.datetime.strptime(str_date, "%m/%d/%Y")
+            + datetime.timedelta(minutes=1)
         )
         json_data = await self.binance.get_history(symbol, start_date, end_date)
         await ctx.send(
-            f"Price of **{symbol}** at *{arg_date}*: `{float(json_data[0]['p'])}`"
+            f"Price of **{symbol}** at *{date}*: `{float(json_data[0]['p'])}`"
         )
 
 
