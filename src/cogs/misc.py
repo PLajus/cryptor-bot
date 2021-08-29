@@ -23,7 +23,6 @@ class Misc(commands.Cog, name="Misc"):
                 f"Order type `{order_type}` does not exist. Please use asks/bids."
             )
             return
-
         if amount < 0 or amount > 5:
             await ctx.send("Invalid order amount. Please choose from 1 to 5.")
             return

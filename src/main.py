@@ -15,16 +15,16 @@ bot = commands.Bot(
     help_command=None,
 )
 
+# Getting token
+load_dotenv()
+TOKEN = os.getenv("DISCORD_TOKEN")
+
 # Loading cogs
 if __name__ == "__main__":
     dir_path = os.path.dirname(os.path.realpath(__file__))
     for filename in os.listdir(f"{dir_path}/cogs"):
         if filename.endswith(".py"):
             bot.load_extension(f"cogs.{filename[:-3]}")
-
-# Getting token
-load_dotenv()
-TOKEN = os.getenv("DISCORD_TOKEN")
 
 
 @bot.event

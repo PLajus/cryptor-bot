@@ -5,6 +5,7 @@ from discord.ext import commands
 import aiohttp
 import asyncio
 
+
 class ErrorHandler(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -12,8 +13,8 @@ class ErrorHandler(commands.Cog):
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
 
-        #if ctx.command.has_error_handler() or ctx.cog.has_error_handler():
-        #    return
+        if ctx.command.has_error_handler() or ctx.cog.has_error_handler():
+            return
 
         ignored_errs = commands.CommandNotFound
 
@@ -36,22 +37,27 @@ class ErrorHandler(commands.Cog):
             await ctx.send("Required argument is missing.")
 
         elif isinstance(error, aiohttp.ClientResponseError):
-            if (error.code == 400):
-                await ctx.send('Symbol could not be found.')
-            else:            
+            if error.code == 400:
+                await ctx.send("Symbol could not be found.")
+            else:
                 print(f"There was en error: {error.code} {error.message}")
-                await ctx.send(f"There was an Error: {error.code} {error.message}. Please try again later.")
-        
+                await ctx.send(
+                    f"There was an Error: {error.code} {error.message}. Please try again later."
+                )
+
         elif isinstance(error, aiohttp.ClientConnectionError):
             print(f"There was en error: {error.code} {error.message}")
             await ctx.send("There was a Connection Error. Please try again later.")
 
-        elif isinstance(error, aiohttp.ClientPayloadError,):
+        elif isinstance(
+            error,
+            aiohttp.ClientPayloadError,
+        ):
             print(f"There was en error: {error.code} {error.message}")
             await ctx.send("There was an Error. Please try again later.")
 
         elif isinstance(error, asyncio.TimeoutError):
-            await ctx.send("There was a Timeout Error. Please try again later.")        
+            await ctx.send("There was a Timeout Error. Please try again later.")
 
         else:
             print(f"There was en error: {error}")
