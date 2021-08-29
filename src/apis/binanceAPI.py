@@ -1,44 +1,52 @@
 """ Binance API requests """
 
-import requests
-
-
-# Exception handling for HTTP GET requests
-def exception_handler_get(func):
-    def wrapper(*args, **kwargs):
-        try:
-            resp = func(*args, **kwargs)
-            resp.raise_for_status()
-        except requests.exceptions.HTTPError as http_err:
-            raise http_err
-        except requests.exceptions.ConnectionError as errc:
-            raise errc
-        except requests.exceptions.Timeout as errt:
-            raise errt
-        except Exception as err:
-            raise err
-        else:
-            return resp
-
-    return wrapper
+import aiohttp
 
 
 class Binance:
     def __init__(self):
         self.BASE_URL = "https://api.binance.com/api/"
 
-    @exception_handler_get
-    def test_connectivity(self):
-        return requests.get(self.BASE_URL + "v3/ping", timeout=3)
+    async def ping_binance(self):
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                self.BASE_URL + "v3/ping", raise_for_status=True
+            ) as response:
+                return await response.status
 
-    @exception_handler_get
-    def get_price(self, symbol):
-        payload = {"symbol": symbol}
-        return requests.get(
-            self.BASE_URL + "v3/ticker/price", params=payload, timeout=3
-        )
+    async def get_price(self, symbol):
+        params = {"symbol": symbol}
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                self.BASE_URL + "v3/ticker/price", params=params, raise_for_status=True
+            ) as response:
+                return await response.json()
 
-    @exception_handler_get
-    def get_24hrdata(self, symbol):
-        payload = {"symbol": symbol}
-        return requests.get(self.BASE_URL + "v3/ticker/24hr", params=payload, timeout=3)
+    async def get_24hrdata(self, symbol):
+        params = {"symbol": symbol}
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                self.BASE_URL + "v3/ticker/24hr", params=params, raise_for_status=True
+            ) as response:
+                return await response.json()
+
+    async def get_orders(self, symbol):
+        params = {"symbol": symbol, "limit": 5}
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                self.BASE_URL + "v3/depth", params=params, raise_for_status=True
+            ) as response:
+                return await response.json()
+
+    async def get_history(self, symbol, start_date, end_date):
+        params = {
+            "symbol": symbol,
+            "startTime": start_date,
+            "endTime": end_date,
+            "limit": 5,
+        }
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                self.BASE_URL + "v3/aggTrades", params=params, raise_for_status=True
+            ) as response:
+                return await response.json()
